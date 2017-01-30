@@ -1,0 +1,22 @@
+#!/usr/bin/bash
+#
+# delete-small-images - delete images smaller than SIZE pixels
+#
+# Usage: $0 [SIZE]
+#
+
+L=0
+S=0
+MIN=${1:-200}
+
+for FILE in $(find . -type f -iname '*.png' -o -iname '*.jpg'); do
+	SIZE=$(identify -format "%[fx:w] %[fx:h]" "${FILE}")
+	if [[ $(echo "${SIZE}" | cut -d' ' -f1) -lt "${MIN}" || $(echo "${SIZE}" | cut -d' ' -f2) < "${MIN}" ]]; then
+		S=$((S+1))
+		echo rm -v "${FILE}"
+	else
+		L=$((L+1))
+	fi
+done
+
+echo "Removed $S smaller files and kept $L larger files"
