@@ -2,6 +2,8 @@
 #
 # bat - battery utilities
 #
+# Usage: bat COMMAND [PARAMETERS ...]
+#
 
 BAT="BAT0"
 SYSBAT="/sys/class/power_supply/${BAT}/"
