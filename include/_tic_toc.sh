@@ -1,20 +1,20 @@
 declare -A _TICTOC
 
 ##
-# _tic - start time tracker
+# tic - start time tracker
 #
-# Usage: _tic [KEY]
+# Usage: tic [KEY]
 #
-function _tic() {
+function tic() {
 	_TICTOC[${1:-default}]=$(date +%s)
 }
 
 ##
-# _toc - stop and return tracked time
+# toc - stop and return tracked time
 #
-# Usage: _toc [KEY]
+# Usage: toc [KEY]
 #
-function _toc() {
+function toc() {
 	return $(($(date +%s) - _TICTOC[${1:-default}]))
 }
 

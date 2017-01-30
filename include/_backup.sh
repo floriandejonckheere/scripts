@@ -3,7 +3,7 @@
 #
 # Usage: _backup SOURCE DEST [ARGS]
 #
-function _backup() {
+function backup() {
 	set -x
 	_ARGS=$3
 

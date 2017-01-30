@@ -1,0 +1,9 @@
+#!/usr/bin/bash
+#
+# autocrop-all - autocrop all images in directory
+#
+
+for FILE in $(ls *.png *.jpg *.jpeg); do
+	echo "Trimming ${FILE}"
+	convert "${FILE}" -trim "${FILE}"
+done
