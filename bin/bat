@@ -1,0 +1,75 @@
+#!/usr/bin/bash
+#
+# bat - battery utilities
+#
+
+BAT="BAT0"
+SYSBAT="/sys/class/power_supply/${BAT}/"
+SMAPIBAT="/sys/devices/platform/smapi/${BAT}/"
+
+function __bat__cap(){
+	[[ "$1" == "h" ]] && { echo -e "cap\tget remaining battery life"; return; }
+	echo "$(cat ${SYSBAT}capacity) % remaining"
+}
+
+function __bat__cap_design(){
+	[[ "$1" == "h" ]] && { echo -e "cap_design\tget remaining battery capacity (in function of design capacity)"; return; }
+	# Remaining capacity
+	CAP=$(cat "${SYSBAT}energy_full")
+	# Design capacity
+	CAPD=$(cat "${SYSBAT}energy_full_design")
+
+	printf "%.2f %% remaining (%.2f Wh of %.2f Wh)\n" \
+		$(echo "scale=4;${CAP}/${CAPD}*100" | bc) \
+		$(echo "scale=2;${CAP}/1000000" | bc) \
+		$(echo "scale=2;${CAPD}/1000000" | bc)
+}
+
+function __bat__thresh(){
+	[[ "$1" == "h" ]] && {
+		echo -e "thresh\tget battery charging threshold"
+		echo -e "thresh START STOP\tset battery charging thresholds"
+		return
+	}
+	if [[ ! $@ ]]; then 
+		printf "%d -> %d\n" \
+			$(cat "${SMAPIBAT}start_charge_thresh") \
+			$(cat "${SMAPIBAT}stop_charge_thresh")
+	else
+		printf "New thresholds: %d -> %d. Continue? " $(($1)) $(($2))
+		read -n 1 CONT
+		[[ "${CONT}" != "y" ]] && { echo "Aborting."; exit 1; }
+		echo  
+		sudo bash -c "echo $(($1)) > ${SMAPIBAT}start_charge_thresh"
+		sudo bash -c "echo $(($2)) > ${SMAPIBAT}stop_charge_thresh"
+		echo "New values: $(__bat__thresh)"
+	fi
+}
+
+function __bat__cycles(){
+	[[ "$1" == "h" ]] && { echo -e "cycles\tget battery charging cycles"; return; }
+	cat "${SMAPIBAT}cycle_count"
+}
+
+function __bat__stat(){
+	[[ "$1" == "h" ]] && { echo -e "stat\tget battery status"; return; }
+	cat "${SYSBAT}/status"
+}
+
+function __bat__power(){
+	[[ "$1" == "h" ]] && { echo -e "power\tget actual battery output"; return; }
+	echo $(echo "scale=2;$(cat ${SYSBAT}/power_now)/1000/1000" | bc) W
+}
+
+##
+### INSERT NEW FUNCTIONALITY HERE
+##
+
+[[ ! $@ ]] && {
+	for FUNC in $(compgen -A function __bat__); do
+		"${FUNC}" h
+	done
+	exit 1
+}
+
+__bat__$@
