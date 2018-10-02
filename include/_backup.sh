@@ -4,11 +4,13 @@
 # Usage: _backup SOURCE DEST [ARGS]
 #
 function backup() {
-	set -x
-	_ARGS=$3
+	_SRC=$1
+	_DST=$2
+	shift; shift
 
-	rsync -av ${_ARGS} \
-		--progress --delete-after --inplace --partial --append-verify --delete-excluded \
+	set -x
+	rsync -aAXv $@ \
+		--progress --stats --delete-after --inplace --partial --append-verify --delete-excluded \
 		--exclude .local/share/Trash \
 		--exclude .thumbnails \
 		--exclude .cache \
@@ -25,8 +27,17 @@ function backup() {
 		--exclude public/assets \
 		--exclude 'Videos' \
 		--exclude 'VirtualBox VMs' \
+		--exclude /proc \
+		--exclude /sys \
+		--exclude /dev \
+		--exclude /mnt \
+		--exclude /shm \
+		--exclude /tmp \
+		--exclude /run \
+		--exclude /media \
+		--exclude /lost+found \
 		\
-		${1} \
-		${2}
+		${_SRC} \
+		${_DST}
 	set +x
 }
