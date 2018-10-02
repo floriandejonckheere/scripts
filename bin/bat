@@ -35,15 +35,15 @@ function __bat__thresh(){
 	}
 	if [[ ! $@ ]]; then 
 		printf "%d -> %d\n" \
-			$(cat "${SMAPIBAT}start_charge_thresh") \
-			$(cat "${SMAPIBAT}stop_charge_thresh")
+			$(sudo tpacpi-bat -g ST 1 | cut -d' ' -f1) \
+			$(sudo tpacpi-bat -g SP 1 | cut -d' ' -f1)
 	else
 		printf "New thresholds: %d -> %d. Continue? " $(($1)) $(($2))
 		read -n 1 CONT
 		[[ "${CONT}" != "y" ]] && { echo "Aborting."; exit 1; }
-		echo  
-		sudo bash -c "echo $(($1)) > ${SMAPIBAT}start_charge_thresh"
-		sudo bash -c "echo $(($2)) > ${SMAPIBAT}stop_charge_thresh"
+		echo
+		sudo tpacpi-bat -s ST 1 $1
+		sudo tpacpi-bat -s SP 1 $2
 		echo "New values: $(__bat__thresh)"
 	fi
 }
