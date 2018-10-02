@@ -1,0 +1,8 @@
+#!/bin/bash -x
+#
+# Sets timezone automatically
+#
+TIMEZONE=`curl --silent https://ipapi.co/timezone`
+(( $? )) && { echo "Could not set timezone."; exit 1; }
+
+timedatectl set-timezone ${TIMEZONE}
