@@ -10,7 +10,7 @@ function backup() {
 
 	set -x
 	rsync -aAXv $@ \
-		--progress --stats --delete-after --inplace --partial --append-verify --delete-excluded \
+		--progress --stats --delete-after --inplace --partial --sparse --append-verify --delete-excluded \
 		--exclude .local/share/Trash \
 		--exclude .thumbnails \
 		--exclude .cache \
